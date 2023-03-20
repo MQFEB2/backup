@@ -1,32 +1,227 @@
 <script>
-export default defineComponent({
-  setup () {
+  import { defineComponent, ref } from 'vue'
+  
+  import { Add, FolderOutline } from "@vicons/ionicons5";
+  import { Filter, ChevronForward, EllipsisHorizontalOutline, BarcodeOutline, ChevronDown, CloseOutline } from '@vicons/ionicons5'
+  import { Save } from "@vicons/carbon";
+  
+  
+  export default defineComponent({
+    data() {
     return {
-      selectValue: ref(null),
+      selectValue: ref(null), // định nghĩa thuộc tính selectValue
       options: [
-        {
-          label: 'Drive My Car',
-          value: 'song1'
-        },
-        {
-          label: 'Norwegian Wood',
-          value: 'song2'
-        },
-        {
-          label: 'Nowhere Man',
-          value: 'song4'
-        },
-      ]
+          {
+            label: "Everybody's Got Something to Hide Except Me and My Monkey",
+            value: 'song0',
+            disabled: true
+          },
+          {
+            label: 'Drive My Car',
+            value: 'song1'
+          },
+          {
+            label: 'Norwegian Wood',
+            value: 'song2'
+          },
+          {
+            label: "You Won't See",
+            value: 'song3',
+            disabled: true
+          },
+          {
+            label: 'Nowhere Man',
+            value: 'song4'
+          },
+          {
+            label: 'Think For Yourself',
+            value: 'song5'
+          },
+          {
+            label: 'The Word',
+            value: 'song6'
+          },
+          {
+            label: 'Michelle',
+            value: 'song7',
+            disabled: true
+          },
+          {
+            label: 'What goes on',
+            value: 'song8'
+          },
+          {
+            label: 'Girl',
+            value: 'song9'
+          },
+          {
+            label: "I'm looking through you",
+            value: 'song10'
+          },
+          {
+            label: 'In My Life',
+            value: 'song11'
+          },
+          {
+            label: 'Wait',
+            value: 'song12'
+          }
+        ]
     }
-  }
-})
-</script>
-
-<template>
-  <n-space vertical>
-    <n-select v-model:value="selectValue" filterable tag :options="options" />
-  </n-space>
-</template>
-<script setup>
-import { NSpace,NSelect } from 'naive-ui';
-</script>
+  },
+    name: "App",
+    components: {
+      Add,
+      FolderOutline,
+      ChevronForward,
+      EllipsisHorizontalOutline,
+      BarcodeOutline,
+      ChevronDown,
+      CloseOutline,
+      Save,
+    },
+  })
+  
+  </script>
+    
+  <template>
+    <div class="flex flex-row m0">
+      <div id="sidebar" class="top-0 left-0 bg-gray-50 flex flex-col w-80 h-screen items-center">
+        <div class="truncate box-border mt5">
+  
+          <div class="p2 z-20 flex flex-row">
+            <n-button text><n-icon size="28" class="mr-1">
+                <Add />
+              </n-icon>
+            </n-button>
+  
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none">
+                <n-icon size="18" class="w-5 h-5 text-gray-400" :component="Filter" />
+              </div>
+              <input type="text"
+                class="h-6 border-1 border-slate-200 bg-slate-50 pl-9 p-0.5 text-gray-900 hover:bg-gray-100 hover:focus:bg-white focus:bg-white focus:outline-none">
+              <!-- <input type="text" class=" pl-10 p-0.5"> -->
+            </div>
+  
+          </div>
+  
+  
+          <!-- Collection sidebar list -->
+          <div class="mt-5 p2 ">
+            <n-collapse>
+              <n-collapse-item title="Collection" name="1">
+                <n-collapse-item>
+                  <template #header>
+                    <n-icon>
+                      <FolderOutline />
+                    </n-icon>
+                    <div class="ml2">New Folder</div>
+                  </template>
+                  <button class="border-none flex flex-row mx-1 items-center pl-4">
+                    <div class="color-emerald">GET</div>
+                    <div class="ml-1">New Request</div>
+                  </button>
+                </n-collapse-item>
+  
+              </n-collapse-item>
+  
+              <n-collapse-item title="right" name="2">
+                <div>nice</div>
+              </n-collapse-item>
+              <n-collapse-item title="right" name="3">
+                <div>very good</div>
+              </n-collapse-item>
+            </n-collapse>
+          </div>
+        </div>
+  
+      </div>
+  
+      <!-- Request Tab Content -->
+      <div id="main" class="flex flex-col grow">
+  
+        <div class="flex flex-row box-border items-center flex-nowrap">
+          <div class="flex flex-nowrap justify-between h-12 items-center w-40 pl-4 flex-none">
+            <div class="color-emerald w-1/5">GET</div>
+            <div class="w-3/5">New Request</div>
+            <div class="flex justify-end h-5 w-1/5">
+              <button class="p0 bg-white border-none hover:bg-gray-100 active:bg-gray-200 rounded items-center h-5"><n-icon
+                  size="20">
+                  <CloseOutline />
+                </n-icon></button>
+            </div>
+          </div>
+  
+          <n-divider vertical style="height:100%;" />
+  
+          <button class="p0 bg-white border-none hover:bg-gray-100 active:bg-gray-200 rounded items-center h-5">
+            <n-icon size="20">
+              <Add />
+            </n-icon>
+          </button>
+  
+          <div class="w-4/5 flex justify-end  py-2 px-4">
+            <button class="h-7 bg-white border-none hover:bg-gray-100 active:bg-gray-200 rounded items-center">
+              <n-icon size="20">
+                <BarcodeOutline />
+              </n-icon>
+            </button>
+          </div>
+  
+        </div>
+  
+        <n-divider style="margin-top: 0px; margin-bottom: 0px; width:100%;" />
+  
+        <div class="h-12 mx-1 pl-5 items-center flex flex-row">
+          <div class="color-slate-300">Collection</div>
+          <n-divider vertical />
+          <div class="font-semibold ml-1 w-2/5">New Request</div>
+  
+          <div class="w-full flex justify-end">
+            <button class="h-7 bg-white border-none hover:bg-gray-100 active:bg-gray-200 rounded items-center">
+              <n-icon size="20">
+                <Save />
+              </n-icon>
+            </button>
+            <button class="mx-2 h-7 bg-white border-none hover:bg-gray-100 active:bg-gray-200 rounded items-center">
+              <n-icon size="20">
+                <EllipsisHorizontalOutline />
+              </n-icon>
+            </button>
+  
+          </div>
+  
+        </div>
+  
+        <n-divider style="margin-top: 0px; margin-bottom: 0px; width:100%;" />
+  
+        <div class="h-12 mx-1 pl-5 items-center flex flex-row">
+          <n-space vertical>
+            <n-select v-model:value="selectValue" filterable tag :options="options" />
+          </n-space>
+        </div>
+  
+  
+        <div class="flex">
+          <div class="w-1/5 bg-blue-500 text-white py-2 px-4 rounded">Trái 1</div>
+          <div class="w-1/5 bg-blue-500 text-white py-2 px-4 rounded">Trái 2</div>
+          <div class="w-4/5 flex justify-end">
+            <div class="bg-red-500 text-white py-2 px-4 rounded">Phải 1</div>
+            <div class="bg-red-500 text-white py-2 px-4 rounded">Phải 2</div>
+            <div class="bg-red-500 text-white py-2 px-4 rounded">Phải 3</div>
+          </div>
+        </div>
+      </div>
+  
+  
+  
+  
+      <!-- Tab Header -->
+  
+    </div>
+  </template>
+    
+  <script setup>
+  import { NIcon, NCollapse, NCollapseItem, NButton, NSpace, NSelect, NDivider } from "naive-ui";
+  </script>
