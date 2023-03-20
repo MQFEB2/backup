@@ -36,36 +36,29 @@ export default {
 <script setup>
 import { NIcon, NCollapse, NCollapseItem } from "naive-ui";
 </script>
+let selectValue = ref(null)
+const options = [
+  {
+    label: 'Get',
+    value: 'get'
+  },
+  {
+    label: 'Put',
+    value: 'put'
+  },
+  {
+    label: 'Post',
+    value: 'post'
+  },
+]
 
-<script>
-export default defineComponent({
-  setup () {
-    return {
-      selectValue: ref(null),
-      options: [
-        {
-          label: 'Drive My Car',
-          value: 'song1'
-        },
-        {
-          label: 'Norwegian Wood',
-          value: 'song2'
-        },
-        {
-          label: 'Nowhere Man',
-          value: 'song4'
-        },
-      ]
-    }
-  }
-})
-</script>
 
-<template>
-  <n-space vertical>
-    <n-select v-model:value="selectValue" filterable tag :options="options" />
-  </n-space>
-</template>
-<script setup>
-import { NSpace,NSelect } from 'naive-ui';
-</script>
+      <div class="flex">
+        <div class="w-1/5 bg-blue-500 text-white py-2 px-4 rounded">Trái 1</div>
+        <div class="w-1/5 bg-blue-500 text-white py-2 px-4 rounded">Trái 2</div>
+        <div class="w-4/5 flex justify-end">
+          <div class="bg-red-500 text-white py-2 px-4 rounded">Phải 1</div>
+          <div class="bg-red-500 text-white py-2 px-4 rounded">Phải 2</div>
+          <div class="bg-red-500 text-white py-2 px-4 rounded">Phải 3</div>
+        </div>
+      </div>
