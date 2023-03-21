@@ -1,9 +1,7 @@
 <script>
-
 import { Add, FolderOutline } from "@vicons/ionicons5";
 import { Filter, ChevronForward, EllipsisHorizontalOutline, BarcodeOutline, ChevronDown, CloseOutline } from '@vicons/ionicons5'
 import { Save } from "@vicons/carbon";
-
 
 export default defineComponent({
   name: "App",
@@ -36,7 +34,7 @@ const Options = [
 ]
 
 </script>
-    
+
 <template>
   <div class="flex flex-row m0">
     <div id="sidebar" class="top-0 left-0 bg-gray-50 flex flex-col w-80 h-screen items-center">
