@@ -4,6 +4,18 @@ import { Filter, ChevronForward, EllipsisHorizontalOutline, BarcodeOutline, Chev
 import { Save } from "@vicons/carbon";
 
 export default defineComponent({
+  data() {
+    return {
+      prefix: '',
+    }
+  },
+  computed: {
+    filteredNames() {
+      return this.names.filter((n) =>
+        n.toLowerCase().startsWith(this.prefix.toLowerCase())
+      )
+    }
+  },
   name: "App",
   components: {
     Add,
@@ -50,7 +62,7 @@ const Options = [
             <div class="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none">
               <n-icon size="18" class="w-5 h-5 text-gray-400" :component="Filter" />
             </div>
-            <input type="text"
+            <input type="text" v-model="prefix" placeholder="Filter"
               class="h-6 border-1 border-slate-200 bg-slate-50 pl-9 p-0.5 text-gray-900 hover:bg-gray-100 hover:focus:bg-white focus:bg-white focus:outline-none">
             <!-- <input type="text" class=" pl-10 p-0.5"> -->
           </div>
@@ -253,4 +265,6 @@ const Options = [
     
 <script setup>
 import { NIcon, NCollapse, NCollapseItem, NButton, NSpace, NSelect, NDivider, NInput, NTable } from "naive-ui";
+
+
 </script>
