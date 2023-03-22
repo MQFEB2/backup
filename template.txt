@@ -1,0 +1,40 @@
+<template>
+  <div>
+    <h2>My Collection</h2>
+    <ul>
+      <li v-for="(item, index) in items" :key="item.id">
+        {{ item.name }}
+      </li>
+    </ul>
+
+    <form @submit.prevent="addItem">
+      <input type="text" v-model="newItemName" />
+      <button type="submit">Add Item</button>
+    </form>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      items: [
+        { id: 1, name: "Item 1" },
+        { id: 2, name: "Item 2" },
+        { id: 3, name: "Item 3" },
+      ],
+      newItemName: "",
+    };
+  },
+  methods: {
+    addItem() {
+      const newItem = {
+        id: this.items.length + 1,
+        name: this.newItemName,
+      };
+      this.items.push(newItem);
+      this.newItemName = "";
+    },
+  },
+};
+</script>

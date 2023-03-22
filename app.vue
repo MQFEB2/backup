@@ -1,270 +1,104 @@
 <script>
-import { Add, FolderOutline } from "@vicons/ionicons5";
-import { Filter, ChevronForward, EllipsisHorizontalOutline, BarcodeOutline, ChevronDown, CloseOutline } from '@vicons/ionicons5'
-import { Save } from "@vicons/carbon";
 
+const Collection = [{
+  id: 1,
+  name: "New Collection",
+  item: [
+    {
+      id: 2,
+      name: "New Folder",
+      item: [
+        {
+          id: 3,
+          name: "New Request",
+          request: {
+            method: "GET",
+          },
+        }
+      ]
+    },
+    {
+      id: 4,
+      name: "New Folder",
+      item: []
+    },
+    {
+      id: 5,
+      name: "New Request",
+      request: {
+        method: "GET",
+      },
+    }
+  ]
+},
+{
+  id: 6,
+  name: "Collection 2",
+  item: [{
+    id: 7,
+    name: "New Folder",
+    item: []
+  },],
+}
+]
 export default defineComponent({
+  components: {
+    Collection
+  },
+  props: {
+    todo: Object
+  },
   data() {
     return {
+      Collection,
       prefix: '',
     }
   },
-  computed: {
-    filteredNames() {
-      return this.names.filter((n) =>
-        n.toLowerCase().startsWith(this.prefix.toLowerCase())
-      )
-    }
-  },
-  name: "App",
-  components: {
-    Add,
-    FolderOutline,
-    ChevronForward,
-    EllipsisHorizontalOutline,
-    BarcodeOutline,
-    ChevronDown,
-    CloseOutline,
-    Save,
-  },
 })
 
-let selectValue = ref('GET')
-const Options = [
-  {
-    label: 'GET',
-    value: 'get'
-  },
-  {
-    label: 'PUT',
-    value: 'put'
-  },
-  {
-    label: 'POST',
-    value: 'post'
-  },
-]
 
 </script>
 
 <template>
   <div class="flex flex-row m0">
     <div id="sidebar" class="top-0 left-0 bg-gray-50 flex flex-col w-80 h-screen items-center">
-      <div class="truncate box-border mt5">
 
-        <div class="p2 z-20 flex flex-row">
-          <n-button text><n-icon size="28" class="mr-1">
-              <Add />
-            </n-icon>
-          </n-button>
+      <!-- Collection sidebar list -->
+      <div class="mt-5 p2 ">
 
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none">
-              <n-icon size="18" class="w-5 h-5 text-gray-400" :component="Filter" />
-            </div>
-            <input type="text" v-model="prefix" placeholder="Filter"
-              class="h-6 border-1 border-slate-200 bg-slate-50 pl-9 p-0.5 text-gray-900 hover:bg-gray-100 hover:focus:bg-white focus:bg-white focus:outline-none">
-            <!-- <input type="text" class=" pl-10 p-0.5"> -->
+
+        <NCollapse>
+          <div v-for="item in Collection" :key="item.id">
+            <NCollapseItem :title="item.name">
+              <div v-for="folder in item.item" :key="folder.id">
+
+                <div v-if="folder.item">
+                  <NCollapseItem :title="folder.name">
+                    <div v-if="folder.item.length > 0">
+                      <div v-for="request in folder.item" :key="request.id">
+                        {{ request.name }}</div>
+                    </div>
+                    <div v-else>This folder is empty</div>
+
+
+                  </NCollapseItem>
+                </div>
+                <div v-else>
+                  {{ folder.name }}
+                </div>
+              </div>
+            </NCollapseItem>
           </div>
 
-        </div>
+        </NCollapse>
 
 
-        <!-- Collection sidebar list -->
-        <div class="mt-5 p2 ">
-          <n-collapse>
-            <n-collapse-item title="Collection" name="1">
-              <n-collapse-item>
-                <template #header>
-                  <n-icon>
-                    <FolderOutline />
-                  </n-icon>
-                  <div class="ml2">New Folder</div>
-                </template>
-                <button class="border-none flex flex-row mx-1 items-center pl-4">
-                  <div class="color-emerald">GET</div>
-                  <div class="ml-1">New Request</div>
-                </button>
-              </n-collapse-item>
-
-            </n-collapse-item>
-
-            <n-collapse-item title="right" name="2">
-              <div>nice</div>
-            </n-collapse-item>
-            <n-collapse-item title="right" name="3">
-              <div>very good</div>
-            </n-collapse-item>
-          </n-collapse>
-        </div>
       </div>
-
     </div>
-
-    <!-- Request Tab Content -->
-    <div id="main" class="flex flex-col grow px-2">
-
-      <div class="flex flex-row box-border items-center flex-nowrap">
-        <div class="flex flex-nowrap justify-between h-12 items-center w-40 pl-4 flex-none">
-          <div class="color-emerald w-1/5">GET</div>
-          <div class="w-3/5">New Request</div>
-          <div class="flex justify-end h-5 w-1/5">
-            <button class="p0 bg-white border-none hover:bg-gray-100 active:bg-gray-200 rounded items-center h-5"><n-icon
-                size="20">
-                <CloseOutline />
-              </n-icon></button>
-          </div>
-        </div>
-
-        <n-divider vertical style="height:100%;" />
-
-        <button class="p0 bg-white border-none hover:bg-gray-100 active:bg-gray-200 rounded items-center h-5">
-          <n-icon size="20">
-            <Add />
-          </n-icon>
-        </button>
-
-        <div class="w-4/5 flex justify-end  py-2 px-4">
-          <button class="h-7 bg-white border-none hover:bg-gray-100 active:bg-gray-200 rounded items-center">
-            <n-icon size="20">
-              <BarcodeOutline />
-            </n-icon>
-          </button>
-        </div>
-
-      </div>
-
-      <n-divider style="margin-top: 0px; margin-bottom: 0px; width:100%;" />
-
-      <div class="h-12 mx-1 items-center flex flex-row">
-        <div class="color-slate-300">Collection</div>
-        <n-divider vertical />
-        <div class="font-semibold ml-1 w-2/5">New Request</div>
-
-        <div class="w-full flex justify-end">
-          <button class="h-7 bg-white border-none hover:bg-gray-100 active:bg-gray-200 rounded items-center">
-            <n-icon size="20">
-              <Save />
-            </n-icon>
-          </button>
-          <button class="mx-2 h-7 bg-white border-none hover:bg-gray-100 active:bg-gray-200 rounded items-center">
-            <n-icon size="20">
-              <EllipsisHorizontalOutline />
-            </n-icon>
-          </button>
-
-        </div>
-
-      </div>
-
-      <n-divider style="margin-top: 0px; margin-bottom: 0px; width:100%;" />
-
-      <div class="h-12 mx-1 items-center flex flex-row">
-        <n-space vertical>
-          <n-select v-model:value="selectValue" filterable :options="Options" />
-        </n-space>
-        <n-input type="text" placeholder="Enter URL" class="" />
-        <button
-          class="mx-2 w-20 h-8 font-bold text-white bg-blue-600 border-none hover:bg-blue-700 active:bg-blue-900 rounded">Send</button>
-      </div>
-      <n-divider style="margin-top: 0px; margin-bottom: 0px; width:100%;" />
-
-
-
-      <div class="flex flex-row h-full">
-
-        <div class="basis-1/2">
-
-          <div class="h-10 mx-1 items-center flex flex-row">
-            <div class="w-15 border-b-4 border-slate-500">Params</div>
-            <div class="p-2 w-15">Headers</div>
-            <div class="p-2 w-15">Body</div>
-          </div>
-
-          <div class="h-10 mx-1 items-center flex">
-            <div class="text-slate-700">Query Params</div>
-          </div>
-          <n-table :single-line="false">
-            <thead>
-              <tr>
-                <th></th>
-                <th>Key</th>
-                <th>Value</th>
-                <th>Description</th>
-                <th>More</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td>name</td>
-                <td>Quan</td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>...</td>
-                <td>...</td>
-                <td>...</td>
-                <td>...</td>
-                <td>...</td>
-              </tr>
-            </tbody>
-          </n-table>
-        </div>
-        <n-divider vertical style="height:100%;" />
-
-        <div class="basis-1/2">
-          <div class="h-10 items-center flex flex-row">
-            <div class="w-15 border-b-4 border-slate-500">Response</div>
-          </div>
-          <div class="h-10 items-center flex flex-row">
-            <div class="w-15 border-b-4 border-slate-500">Params</div>
-            <div class="p-2 w-15">Headers</div>
-            <div class="p-2 w-15">Body</div>
-          </div>
-          <n-table :single-line="false">
-            <thead>
-              <tr>
-                <th></th>
-                <th>Key</th>
-                <th>Value</th>
-                <th>Description</th>
-                <th>More</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td>name</td>
-                <td>Quan</td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>...</td>
-                <td>...</td>
-                <td>...</td>
-                <td>...</td>
-                <td>...</td>
-              </tr>
-            </tbody>
-          </n-table>
-        </div>
-      </div>
-
-    </div>
-
-
-
-
-    <!-- Tab Header -->
-
   </div>
 </template>
-    
-<script setup>
-import { NIcon, NCollapse, NCollapseItem, NButton, NSpace, NSelect, NDivider, NInput, NTable } from "naive-ui";
 
+<script setup>
+import { NIcon, NCollapse, NCollapseItem, } from "naive-ui";
 
 </script>
