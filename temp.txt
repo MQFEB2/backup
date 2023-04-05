@@ -1,15 +1,12 @@
 <script>
 import { FolderOutline } from "@vicons/ionicons5";
 
-export default {
-  name: "MyCollapse",
-  components: {
-    FolderOutline,
-  },
-  data() {
-    return {
-      titleClass: ''
-    }
+interface RowData {
+  key: number
+  name: string
+  age: string
+  address: string
+}
   },
 };
 </script>
