@@ -1,227 +1,389 @@
 <script>
-  import { defineComponent, ref } from 'vue'
+  import DataTable from "~~/components/DataTable.vue";
   
-  import { Add, FolderOutline } from "@vicons/ionicons5";
-  import { Filter, ChevronForward, EllipsisHorizontalOutline, BarcodeOutline, ChevronDown, CloseOutline } from '@vicons/ionicons5'
-  import { Save } from "@vicons/carbon";
+  import {
+    NCard,
+    NTree,
+    NIcon,
+    NCollapse,
+    NCollapseItem,
+    NSpace,
+    NSelect,
+    NDivider,
+    NInput,
+    NTable,
+    NBreadcrumb,
+    NBreadcrumbItem,
+    NCode,
+    NTabs,
+    NTabPane,
+    NDataTable,
+  } from "naive-ui";
   
+  import { Add } from "@vicons/ionicons5";
+  import {
+    Filter,
+    ChevronForward,
+    EllipsisHorizontalOutline,
+    BarcodeOutline,
+    ChevronDown,
+    CloseOutline,
+  } from "@vicons/ionicons5";
+  import { Save, Folder } from "@vicons/carbon";
   
   export default defineComponent({
-    setup () {
-      return {
-        selectValue: ref(null),
-        options: [
-          {
-            label: "Everybody's Got Something to Hide Except Me and My Monkey",
-            value: 'song0',
-            disabled: true
-          },
-          {
-            label: 'Drive My Car',
-            value: 'song1'
-          },
-          {
-            label: 'Norwegian Wood',
-            value: 'song2'
-          },
-          {
-            label: "You Won't See",
-            value: 'song3',
-            disabled: true
-          },
-          {
-            label: 'Nowhere Man',
-            value: 'song4'
-          },
-          {
-            label: 'Think For Yourself',
-            value: 'song5'
-          },
-          {
-            label: 'The Word',
-            value: 'song6'
-          },
-          {
-            label: 'Michelle',
-            value: 'song7',
-            disabled: true
-          },
-          {
-            label: 'What goes on',
-            value: 'song8'
-          },
-          {
-            label: 'Girl',
-            value: 'song9'
-          },
-          {
-            label: "I'm looking through you",
-            value: 'song10'
-          },
-          {
-            label: 'In My Life',
-            value: 'song11'
-          },
-          {
-            label: 'Wait',
-            value: 'song12'
-          }
-        ]
-      }
-    },
-    name: "App",
     components: {
+      NCard,
+      NDataTable,
+      NIcon,
+      NCollapse,
+      NCollapseItem,
+      NSpace,
+      NSelect,
+      NDivider,
+      NInput,
+      NTable,
+      NBreadcrumb,
+      NBreadcrumbItem,
+      NCode,
+      NTabPane,
+      NTabs,
       Add,
-      FolderOutline,
+      NTree,
+      Folder,
       ChevronForward,
       EllipsisHorizontalOutline,
       BarcodeOutline,
       ChevronDown,
       CloseOutline,
       Save,
+      Filter,
+      DataTable,
     },
-  })
+    setup() {
+      const DataTB = [
+        {
+          key: 0,
+          keyPm: "John Brown",
+          value: "32",
+          description: "New York No. 1 Lake Park",
+        },
+        {
+          key: 1,
+          keyPm: "Jim Green",
+          value: "42",
+          description: "London No. 1 Lake Park",
+        },
+        {
+          key: 2,
+          keyPm: "Joe Black",
+          value: "32",
+          description: "Sidney No. 1 Lake Park",
+        },
+      ];
+      const DataTBHeader = [
+        {
+          key: 0,
+          keyPm: "id",
+          value: "32",
+          description: "",
+        },
+        {
+          key: 1,
+          keyPm: "username",
+          value: "quaaan",
+          description: "",
+        },
+        {
+          key: 2,
+          keyPm: "pw",
+          value: "32",
+          description: "",
+        },
+      ];
+      const selectValue = ref("GET");
+      const Options = [
+        {
+          label: "GET",
+          value: "get",
+        },
+        {
+          label: "PUT",
+          value: "put",
+        },
+        {
+          label: "POST",
+          value: "post",
+        },
+      ];
+      const Collection = ref([
+        {
+          id: 1,
+          name: "New Collection",
+          item: [
+            {
+              id: 2,
+              name: "New Folder",
+              item: [
+                {
+                  id: 3,
+                  name: "New Request",
+                  request: {
+                    method: "GET",
+                  },
+                },
+              ],
+            },
+            {
+              id: 4,
+              name: "New Folder",
+              item: [],
+            },
+            {
+              id: 5,
+              name: "New Request",
+              request: {
+                method: "GET",
+              },
+            },
+          ],
+        },
+        {
+          id: 6,
+          name: "Collection 2",
+          item: [
+            {
+              id: 7,
+              name: "New Folder",
+              item: [],
+            },
+          ],
+        },
+      ]);
   
+      function addItem() {
+        const newItem = {
+          id: Collection.value.length + 1,
+          name: "New Collection",
+          item: [],
+        };
+        console.log("New item");
+        Collection.value.push(newItem);
+      }
+  
+      return {
+        Collection,
+        addItem,
+        selectValue,
+        Options,
+        DataTB,
+        DataTBHeader,
+      };
+    },
+  });
   </script>
-    
+  
   <template>
     <div class="flex flex-row m0">
-      <div id="sidebar" class="top-0 left-0 bg-gray-50 flex flex-col w-80 h-screen items-center">
-        <div class="truncate box-border mt5">
-  
-          <div class="p2 z-20 flex flex-row">
-            <n-button text><n-icon size="28" class="mr-1">
-                <Add />
-              </n-icon>
-            </n-button>
-  
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none">
-                <n-icon size="18" class="w-5 h-5 text-gray-400" :component="Filter" />
-              </div>
-              <input type="text"
-                class="h-6 border-1 border-slate-200 bg-slate-50 pl-9 p-0.5 text-gray-900 hover:bg-gray-100 hover:focus:bg-white focus:bg-white focus:outline-none">
-              <!-- <input type="text" class=" pl-10 p-0.5"> -->
+      <div id="sidebar" class="bg-gray-50 flex flex-col w-80 h-screen items-center">
+        <!-- Add collection, search bar -->
+        <div class="p2 z-20 flex flex-row mt-2">
+          <button
+            @click="addItem"
+            class="p0 h-7 bg-slate-50 border-none hover:bg-gray-100 active:bg-gray-200 rounded items-center"
+          >
+            <NIcon size="28">
+              <Add />
+            </NIcon>
+          </button>
+          <div class="relative pl-1">
+            <div
+              class="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none"
+            >
+              <NIcon size="18" class="w-5 h-5 text-gray-400">
+                <Filter />
+              </NIcon>
             </div>
-  
-          </div>
-  
-  
-          <!-- Collection sidebar list -->
-          <div class="mt-5 p2 ">
-            <n-collapse>
-              <n-collapse-item title="Collection" name="1">
-                <n-collapse-item>
-                  <template #header>
-                    <n-icon>
-                      <FolderOutline />
-                    </n-icon>
-                    <div class="ml2">New Folder</div>
-                  </template>
-                  <button class="border-none flex flex-row mx-1 items-center pl-4">
-                    <div class="color-emerald">GET</div>
-                    <div class="ml-1">New Request</div>
-                  </button>
-                </n-collapse-item>
-  
-              </n-collapse-item>
-  
-              <n-collapse-item title="right" name="2">
-                <div>nice</div>
-              </n-collapse-item>
-              <n-collapse-item title="right" name="3">
-                <div>very good</div>
-              </n-collapse-item>
-            </n-collapse>
+            <input
+              type="text"
+              v-model="prefix"
+              placeholder="Filter"
+              class="h-6 border-1 border-slate-200 bg-slate-50 pl-9 p-0.5 text-gray-900 hover:bg-gray-100 hover:focus:bg-white focus:bg-white focus:outline-none"
+            />
           </div>
         </div>
   
+        <!-- Collection sidebar list -->
+        <div class="mt-5 w-4/5 p2 overflow-y-auto">
+          <NCollapse>
+            <div v-for="item in Collection" :key="item.id">
+              <NCollapseItem :title="item.name">
+                <div v-if="item.item && item.item.length">
+                  <div v-for="folder in item.item" :key="folder.id">
+                    <div v-if="folder.item">
+                      <NCollapseItem>
+                        <template #header>
+                          <NIcon size="15" class="pr-1">
+                            <Folder />
+                          </NIcon>
+                          {{ folder.name }}
+                        </template>
+                        <div v-if="folder.item.length > 0">
+                          <NuxtLink
+                            to="/request"
+                            v-for="request in folder.item"
+                            :key="request.id"
+                            class="pb-3"
+                          >
+                            {{ request.name }}
+                          </NuxtLink>
+                        </div>
+                        <div v-else>This folder is empty</div>
+                      </NCollapseItem>
+                      <NDivider style="margin-top: 10px; margin-bottom: 10px" />
+                    </div>
+                    <div v-else class="pb-3">
+                      {{ folder.name }}
+                    </div>
+                  </div>
+                </div>
+                <div v-else>This collection is empty</div>
+              </NCollapseItem>
+              <NDivider style="margin-top: 10px; margin-bottom: 10px" />
+            </div>
+          </NCollapse>
+          <NTree :data="Collection"></NTree>
+        </div>
       </div>
-  
+      <NuxtPage />
       <!-- Request Tab Content -->
-      <div id="main" class="flex flex-col grow">
-  
+      <div id="main" class="flex flex-col grow px-2 max-h-screen">
         <div class="flex flex-row box-border items-center flex-nowrap">
-          <div class="flex flex-nowrap justify-between h-12 items-center w-40 pl-4 flex-none">
+          <div
+            class="flex flex-nowrap justify-between h-12 items-center w-40 pl-4 flex-none"
+          >
             <div class="color-emerald w-1/5">GET</div>
             <div class="w-3/5">New Request</div>
             <div class="flex justify-end h-5 w-1/5">
-              <button class="p0 bg-white border-none hover:bg-gray-100 active:bg-gray-200 rounded items-center h-5"><n-icon
-                  size="20">
+              <button
+                class="p0 bg-white border-none hover:bg-gray-100 active:bg-gray-200 rounded items-center h-5"
+              >
+                <NIcon size="20">
                   <CloseOutline />
-                </n-icon></button>
+                </NIcon>
+              </button>
             </div>
           </div>
   
-          <n-divider vertical style="height:100%;" />
+          <NDivider vertical style="height: 100%" />
   
-          <button class="p0 bg-white border-none hover:bg-gray-100 active:bg-gray-200 rounded items-center h-5">
-            <n-icon size="20">
+          <button
+            class="p0 bg-white border-none hover:bg-gray-100 active:bg-gray-200 rounded items-center h-5"
+          >
+            <NIcon size="20">
               <Add />
-            </n-icon>
+            </NIcon>
           </button>
   
-          <div class="w-4/5 flex justify-end  py-2 px-4">
-            <button class="h-7 bg-white border-none hover:bg-gray-100 active:bg-gray-200 rounded items-center">
-              <n-icon size="20">
+          <div class="w-4/5 flex justify-end py-2 px-4">
+            <button
+              class="h-7 bg-white border-none hover:bg-gray-100 active:bg-gray-200 rounded items-center"
+            >
+              <NIcon size="20">
                 <BarcodeOutline />
-              </n-icon>
+              </NIcon>
             </button>
           </div>
-  
         </div>
   
-        <n-divider style="margin-top: 0px; margin-bottom: 0px; width:100%;" />
+        <NDivider style="margin-top: 0px; margin-bottom: 0px; width: 100%" />
   
-        <div class="h-12 mx-1 pl-5 items-center flex flex-row">
-          <div class="color-slate-300">Collection</div>
-          <n-divider vertical />
-          <div class="font-semibold ml-1">New Request</div>
+        <div class="h-12 mx-1 items-center flex flex-row">
+          <n-breadcrumb>
+            <n-breadcrumb-item>Collection</n-breadcrumb-item>
+            <n-breadcrumb-item>New Request</n-breadcrumb-item>
+          </n-breadcrumb>
   
           <div class="w-full flex justify-end">
-            <button class="h-7 bg-white border-none hover:bg-gray-100 active:bg-gray-200 rounded items-center">
-              <n-icon size="20">
+            <button
+              class="h-7 bg-white border-none hover:bg-gray-100 active:bg-gray-200 rounded items-center"
+            >
+              <NIcon size="20">
                 <Save />
-              </n-icon>
+              </NIcon>
             </button>
-            <button class="mx-2 h-7 bg-white border-none hover:bg-gray-100 active:bg-gray-200 rounded items-center">
-              <n-icon size="20">
+            <button
+              class="mx-2 h-7 bg-white border-none hover:bg-gray-100 active:bg-gray-200 rounded items-center"
+            >
+              <NIcon size="20">
                 <EllipsisHorizontalOutline />
-              </n-icon>
+              </NIcon>
             </button>
+          </div>
+        </div>
   
+        <NDivider style="margin-top: 0px; margin-bottom: 0px; width: 100%" />
+  
+        <div class="h-12 mx-1 items-center flex flex-row">
+          <NSpace vertical>
+            <NSelect v-model:value="selectValue" filterable :options="Options" />
+          </NSpace>
+          <NInput type="text" placeholder="Enter URL" class="" />
+          <button
+            class="mx-2 w-20 h-8 font-bold text-white bg-blue-600 border-none hover:bg-blue-700 active:bg-blue-900 rounded"
+          >
+            Send
+          </button>
+        </div>
+        <NDivider style="margin-top: 0px; margin-bottom: 0px; width: 100%" />
+  
+        <div class="flex flex-row h-5/6">
+          <!-- main left (request) -->
+          <div class="basis-1/2">
+            <NTabs
+              default-value="Params"
+              size="medium"
+              animated
+              style="margin: 0 6px -4px"
+              pane-style="padding-left: 0px; padding-right: 4px; box-sizing: border-box;"
+            >
+              <NTabPane name="Params" tab="Params">
+                <div class="pb-3 mx-1 items-center flex">
+                  <div class="text-slate-700">Query Params</div>
+                </div>
+                <DataTable :initial-data="DataTB" />
+              </NTabPane>
+              <NTabPane name="Headers" tab="Headers">
+                <div class="pb-3 mx-1 text-slate-700">Headers</div>
+                <DataTable :initial-data="DataTBHeader" />
+              </NTabPane>
+  
+              <NTabPane name="Body" tab="Body"></NTabPane>
+            </NTabs>
           </div>
   
-        </div>
+          <NDivider vertical style="height: 100%" />
   
-        <n-divider style="margin-top: 0px; margin-bottom: 0px; width:100%;" />
-  
-        <div class="h-12 mx-1 pl-5 items-center flex flex-row">
-          <n-space vertical>
-            <n-select v-model:value="selectValue" filterable tag :options="options" />
-          </n-space>
-        </div>
-  
-  
-        <div class="flex">
-          <div class="w-1/5 bg-blue-500 text-white py-2 px-4 rounded">Trái 1</div>
-          <div class="w-1/5 bg-blue-500 text-white py-2 px-4 rounded">Trái 2</div>
-          <div class="w-4/5 flex justify-end">
-            <div class="bg-red-500 text-white py-2 px-4 rounded">Phải 1</div>
-            <div class="bg-red-500 text-white py-2 px-4 rounded">Phải 2</div>
-            <div class="bg-red-500 text-white py-2 px-4 rounded">Phải 3</div>
+          <!-- main right (response) -->
+          <div class="basis-1/2 text-clip overflow-auto">
+            <div class="h-10 items-center flex flex-row">
+              <div class="w-15 border-b-4 border-slate-500">Response</div>
+            </div>
+            <div class="h-10 items-center flex flex-row">
+              <div class="w-15 border-b-4 border-slate-500">Params</div>
+              <div class="p-2 w-15">Headers</div>
+              <div class="p-2 w-15">Body</div>
+            </div>
+            <NCard class="h-4/5">
+              <NCode code="Collection" show-line-numbers>
+                <input />
+              </NCode>
+            </NCard>
           </div>
         </div>
       </div>
   
-  
-  
-  
       <!-- Tab Header -->
-  
     </div>
   </template>
-    
-  <script setup>
-  import { NIcon, NCollapse, NCollapseItem, NButton, NSpace, NSelect, NDivider } from "naive-ui";
-  </script>
+  

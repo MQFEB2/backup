@@ -1,71 +1,92 @@
-<script>
-import { FolderOutline } from "@vicons/ionicons5";
-
-export default {
-  name: "MyCollapse",
-  components: {
-    FolderOutline,
-  },
-  data() {
-    return {
-      titleClass: ''
-    }
-  },
-};
-</script>
-
 <template>
-  <div class="m-5">
-    <n-collapse display-directive="show">
-      <n-collapse-item title="Collection" name="1">
-        <n-collapse-item>
-        <template #header>
-        <n-icon><FolderOutline/></n-icon>
-        <div class="ml2">New Folder</div>
-        </template>
-          <n-collapse-item title="Request">
-          </n-collapse-item>
-          <div>Request</div>
-        </n-collapse-item>
-        
-      </n-collapse-item>
-    </n-collapse>
-  </div>
+  <n-data-table :columns="columns" :data="data" :pagination="pagination" />
+  <pre>{{ JSON.stringify(data, null, 2) }}</pre>
 </template>
+<script lang="ts">
+import { Component, Ref, Vue } from '@nuxtjs/composition-api'
+import { h } from 'vue'
+import { NInput } from 'naive-ui'
+import type { DataTableColumns } from 'naive-ui'
 
-<script setup>
-import { NIcon, NCollapse, NCollapseItem } from "naive-ui";
-</script>
+interface RowData {
+  key: number
+  name: string
+  age: string
+  address: string
+}
 
-<script>
-export default defineComponent({
-  setup () {
-    return {
-      selectValue: ref(null),
-      options: [
-        {
-          label: 'Drive My Car',
-          value: 'song1'
-        },
-        {
-          label: 'Norwegian Wood',
-          value: 'song2'
-        },
-        {
-          label: 'Nowhere Man',
-          value: 'song4'
-        },
-      ]
-    }
+const createData = (): RowData[] => [
+  {
+    key: 0,
+    name: 'John Brown',
+    age: '32',
+    address: 'New York No. 1 Lake Park'
+  },
+  {
+    key: 1,
+    name: 'Jim Green',
+    age: '42',
+    address: 'London No. 1 Lake Park'
+  },
+  {
+    key: 2,
+    name: 'Joe Black',
+    age: '32',
+    address: 'Sidney No. 1 Lake Park'
   }
-})
-</script>
+]
 
-<template>
-  <n-space vertical>
-    <n-select v-model:value="selectValue" filterable tag :options="options" />
-  </n-space>
-</template>
-<script setup>
-import { NSpace,NSelect } from 'naive-ui';
+@Component({})
+export default class DataTable extends Vue {
+  @Ref() data: RowData[] = createData()
+
+  private createColumns (): DataTableColumns<RowData> {
+    return [
+      {
+        title: 'Name',
+        key: 'name',
+        render: (row: RowData, index: number) => {
+          return h(NInput, {
+            value: row.name,
+            onUpdateValue: (v: string) => {
+              this.data[index].name = v
+            }
+          })
+        }
+      },
+      {
+        title: 'Age',
+        key: 'age',
+        render: (row: RowData, index: number) => {
+          return h(NInput, {
+            value: row.age,
+            onUpdateValue: (v: string) => {
+              this.data[index].age = v
+            }
+          })
+        }
+      },
+      {
+        title: 'Address',
+        key: 'address',
+        render: (row: RowData, index: number) => {
+          return h(NInput, {
+            value: row.address,
+            onUpdateValue: (v: string) => {
+              this.data[index].address = v
+            }
+          })
+        }
+      }
+    ]
+  }
+
+  get columns (): DataTableColumns<RowData> {
+    return this.createColumns()
+  }
+
+  pagination = {
+    pageSize: 10
+  }
+}
 </script>

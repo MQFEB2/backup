@@ -1,0 +1,45 @@
+<template>
+  <button @click="fetch">Refresh</button>
+  <NCard class="h-4/5">
+    <NConfigProvider :hljs="hljs">
+      <NCode :code="dt" language="javascript" show-line-numbers></NCode>
+    </NConfigProvider>
+    <highlightjs :code="dt" />
+  </NCard>
+</template>
+
+<script setup>
+import { NCode, NCard, NConfigProvider } from "naive-ui";
+import hljs from "highlight.js/lib/core";
+import javascript from "highlight.js/lib/languages/javascript";
+const DataTB = [
+  {
+    key: 0,
+    keyPm: "request",
+    value: "32",
+    description: "New York No. 1 Lake Park",
+  },
+  {
+    key: 1,
+    keyPm: "request",
+    value: "42",
+    description: "London No. 1 Lake Park",
+  },
+  {
+    key: 2,
+    keyPm: "request",
+    value: "32",
+    description: "Sidney No. 1 Lake Park",
+  },
+];
+hljs.registerLanguage("javascript", javascript);
+
+const { data: post } = await useAsyncData("post", () =>
+  $fetch(`https://jsonplaceholder.typicode.com/users?id=1`)
+);
+
+const dt = JSON.stringify(DataTB, undefined, 5);
+function fetch() {
+  console.log(post);
+}
+</script>
