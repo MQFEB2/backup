@@ -1,0 +1,46 @@
+<template>
+  <div>
+    <div v-for="item in Collection" :key="item.id">
+      {{ item.name }} <button @click="deleteItem(item.id)">Xóa</button>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  setup() {
+    const Collection = ref([
+      {
+        id: 1,
+        name: "New collection",
+        item: [
+          id: 2,
+          name: "New folder",
+          item: [
+            id: 3,
+            name: "New request",
+            request: ""
+          ]
+        ]
+      },
+      {
+        id: 4,
+        name: "New collection 2,
+        item: []
+      }
+    ]); // Giả sử Collection của bạn là một mảng ref
+
+    function deleteItem(id) {
+      const index = Collection.value.findIndex(item => item.id === id);
+      if (index !== -1) {
+        Collection.value.splice(index, 1);
+      }
+    }
+
+    return {
+      Collection,
+      deleteItem,
+    }
+  }
+}
+</script>

@@ -1,0 +1,149 @@
+<template>
+  <div>
+    <button @click="addItem">+</button>
+
+    <!-- <div v-for="item in Collection" :key="item.id">
+      {{ item.name }} <button @click="deleteItem(item.id)">Xóa</button>
+    </div> -->
+
+    <div class="mt-5 w-4/5 p2 overflow-y-auto">
+      <NCollapse>
+        <div v-for="item in Collection" :key="item.id">
+          <NCollapseItem :title="item.name">
+            <button @click="deleteItem(item.id)">Xóa</button>
+            <div v-if="item.item && item.item.length">
+              <div v-for="folder in item.item" :key="folder.id">
+                <div v-if="folder.item">
+                  <NCollapseItem>
+                    <template #header>
+                      {{ folder.name }}
+                    </template>
+                    <button @click="deleteFolder(folder.id)">Xóa</button>
+                    <div v-if="folder.item.length > 0">
+                      <div v-for="request in folder.item" :key="request.id" class="pb-3">
+                        {{ request.name }}
+                      </div>
+                    </div>
+                    <div v-else>This folder is empty</div>
+                  </NCollapseItem>
+                </div>
+                <div v-else class="pb-3">
+                  {{ folder.name }}
+                </div>
+              </div>
+            </div>
+            <div v-else>This collection is empty</div>
+          </NCollapseItem>
+        </div>
+      </NCollapse>
+    </div>
+    <pre>{{ JSON.stringify(Collection, null, 2) }}</pre>
+  </div>
+</template>
+
+<script>
+import { Folder } from "@vicons/carbon";
+import { NCollapse, NCollapseItem } from "naive-ui";
+export default {
+  components: {
+    NCollapse,
+    NCollapseItem,
+    Folder,
+  },
+  setup() {
+    const Collection = ref([
+      {
+        id: 1,
+        name: "New Collection",
+        item: [
+          {
+            id: 2,
+            name: "New Folder",
+            item: [
+              {
+                id: 3,
+                name: "New Request",
+                request: {
+                  method: "GET",
+                },
+              },
+            ],
+          },
+          {
+            id: 4,
+            name: "New Folder",
+            item: [],
+          },
+          {
+            id: 5,
+            name: "New Request",
+            request: {
+              method: "GET",
+            },
+          },
+        ],
+      },
+      {
+        id: 6,
+        name: "Collection 2",
+        item: [
+          {
+            id: 7,
+            name: "New Folder",
+            item: [],
+          },
+        ],
+      },
+    ]); // Giả sử Collection của bạn là một mảng ref
+
+    function deleteItem(id) {
+      const index = Collection.value.findIndex((item) => item.id === id);
+      if (index !== -1) {
+        Collection.value.splice(index, 1);
+      }
+    }
+
+    function deleteFolder(itemId) {
+      Collection.value = Collection.value.map((collection) => {
+        return {
+          ...collection,
+          item: collection.item.filter((folder) => folder.id !== itemId),
+        };
+      });
+    }
+
+    function addFolder(itemId) {
+      id = Collection.value.map((collection) => {
+        return {
+          ...collection,
+          item: collection.item((folder) => folder.id !== itemId),
+        };
+      });
+      const newItem = {
+        id: Collection.value.length + 1,
+        name: "New Collection",
+        item: [],
+      };
+      console.log(newItem.id);
+      Collection.value.push(newItem);
+    }
+
+    function addItem() {
+      const newItem = {
+        id: Collection.value.length + 1,
+        name: "New Collection",
+        item: [],
+      };
+      console.log(newItem.id);
+      Collection.value.push(newItem);
+    }
+
+    return {
+      addItem,
+      Collection,
+      deleteItem,
+      deleteFolder,
+    };
+  },
+};
+</script>

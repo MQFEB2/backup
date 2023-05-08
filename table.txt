@@ -8,12 +8,12 @@ import { h, defineComponent, ref } from "vue";
 import { NDataTable, NInput } from "naive-ui";
 import type { DataTableColumns } from "naive-ui";
 
-interface RowData {
+type RowData = {
   key: number;
   name: string;
   age: string;
   address: string;
-}
+};
 
 const createData = (): RowData[] => [
   {
@@ -30,72 +30,6 @@ const createData = (): RowData[] => [
   },
   {
     key: 2,
-    name: "Joe Black",
-    age: "32",
-    address: "Sidney No. 1 Lake Park",
-  },
-  {
-    key: 3,
-    name: "Joe Black",
-    age: "32",
-    address: "Sidney No. 1 Lake Park",
-  },
-  {
-    key: 4,
-    name: "Joe Black",
-    age: "32",
-    address: "Sidney No. 1 Lake Park",
-  },
-  {
-    key: 5,
-    name: "Joe Black",
-    age: "32",
-    address: "Sidney No. 1 Lake Park",
-  },
-  {
-    key: 6,
-    name: "Joe Black",
-    age: "32",
-    address: "Sidney No. 1 Lake Park",
-  },
-  {
-    key: 7,
-    name: "Joe Black",
-    age: "32",
-    address: "Sidney No. 1 Lake Park",
-  },
-  {
-    key: 8,
-    name: "Joe Black",
-    age: "32",
-    address: "Sidney No. 1 Lake Park",
-  },
-  {
-    key: 9,
-    name: "Joe Black",
-    age: "32",
-    address: "Sidney No. 1 Lake Park",
-  },
-  {
-    key: 10,
-    name: "Joe Black",
-    age: "32",
-    address: "Sidney No. 1 Lake Park",
-  },
-  {
-    key: 11,
-    name: "Joe Black",
-    age: "32",
-    address: "Sidney No. 1 Lake Park",
-  },
-  {
-    key: 12,
-    name: "Joe Black",
-    age: "32",
-    address: "Sidney No. 1 Lake Park",
-  },
-  {
-    key: 13,
     name: "Joe Black",
     age: "32",
     address: "Sidney No. 1 Lake Park",
@@ -147,7 +81,7 @@ export default defineComponent({
       data,
       columns: createColumns(),
       pagination: {
-        pageSize: 5,
+        pageSize: 10,
       },
     };
   },
