@@ -34,6 +34,11 @@ export default defineNuxtConfig({
     shortcuts: [],
     rules: [],
   },
+  runtimeConfig: {
+    public: {
+    baseUrl: process.env.NUXT_PUBLIC_BASE_URL || "http://localhost:8000",
+  }
+}
 })
 
 

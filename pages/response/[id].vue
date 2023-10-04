@@ -26,15 +26,15 @@ import json from "highlight.js/lib/languages/json";
 
 hljs.registerLanguage("json", json);
 
+const config = useRuntimeConfig();
 const { id } = useRoute().params;
-const uri = "http://127.0.0.1:8000/request/responsedata.json/" + id;
+const uri = `${config.public.baseUrl}/v1/response.json?id=` + id;
 
 const { data: Response } = await useFetch(uri);
-console.log(Response.value);
 const receivedData = ref("");
 receivedData.value = Response.value.Body;
 console.log(Response.value.Body);
-const urirq = "http://127.0.0.1:8000/request/data.json?id=" + Response.value.ID;
+const urirq = `${config.public.baseUrl}/v1/request.json?id=` + Response.value.ID;
 const { data: request } = await useFetch(urirq);
 console.log("Get Datarq");
 console.log(request);

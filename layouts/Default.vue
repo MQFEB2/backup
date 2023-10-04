@@ -1,23 +1,348 @@
+<template>
+  <div class="flex flex-row m0 h-screen">
+    <div id="sidebar" class="bg-gray-50 flex flex-col w-80 h-screen items-center">
+      <!-- Add collection, search bar -->
+      <div class="p2 z-20 flex flex-row mt-2">
+        <button
+          @click="addItem"
+          class="p0 h-7 bg-slate-50 border-none hover:bg-gray-100 active:bg-gray-200 rounded items-center"
+        >
+          <NIcon size="28">
+            <Add />
+          </NIcon>
+        </button>
+        <div class="relative pl-1">
+          <div
+            class="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none z-99"
+          >
+            <NIcon size="18" class="h-5 text-gray-400">
+              <Filter />
+            </NIcon>
+          </div>
+          <!-- <n-input v-model:value="pattern" placeholder="Search" class="h-full" /> -->
+          <input
+            v-model="pattern"
+            type="text"
+            placeholder="Filter"
+            class="h-6 border-1 border-slate-200 bg-slate-50 pl-9 p-0.5 text-gray-900 hover:bg-gray-100 hover:focus:bg-white focus:bg-white focus:outline-none"
+          />
+        </div>
+        <NUpload :show-file-list="false" accept=".json" @change="handleFileChange">
+          <button
+            class="ml-2 px-1 h-7 bg-slate-50 border-none hover:bg-gray-100 active:bg-gray-200 rounded items-center"
+          >
+            <NIcon size="20"> <CloudUpload /> </NIcon>
+          </button>
+        </NUpload>
+      </div>
+
+      <!-- Collection sidebar list -->
+      <div class="mt-5 w-4/5 p2 overflow-y-auto">
+        <NTree
+          :data="Item"
+          block-node
+          :pattern="pattern"
+          :node-props="nodeProps"
+          :render-switcher-icon="renderSwitcherIcon"
+          :selectable="false"
+        />
+        <!-- <SidebarOptions
+          @selectedOption="hanleOptionSelected"
+          :Options="optionsForFolder"
+          Target="abc"
+        ></SidebarOptions> -->
+      </div>
+    </div>
+    <div id="main" class="flex flex-col grow px-2 max-h-screen">
+      <slot />
+      <pre>{{ JSON.stringify(Item, null, 2) }}</pre>
+    </div>
+  </div>
+</template>
+
 <script setup>
-import {
-  NInput,
-  NButton,
-  NDropdown,
-  NIcon,
-  NCollapse,
-  NCollapseItem,
-  NDivider,
-  NMessageProvider,
-  NUpload,
-} from "naive-ui";
 import { saveAs } from "file-saver";
 import { Add } from "@vicons/ionicons5";
-import { Filter, EllipsisHorizontalOutline } from "@vicons/ionicons5";
-import { Folder, DocumentImport } from "@vicons/carbon";
+import { Filter, EllipsisHorizontalOutline, CloudUpload } from "@vicons/ionicons5";
+import { Folder, DocumentImport, Json } from "@vicons/carbon";
+import SidebarOptions from "../components/sidebar/Options.vue";
+import { useMessage, NTree, NButton, NIcon, NDropdown, NUpload, NInput } from "naive-ui";
+import {
+  ChevronForward,
+  Folder as FolderIon,
+  FolderOpenOutline,
+  FileTrayFullOutline,
+} from "@vicons/ionicons5";
 
 const getCol = ref();
-const Collection = ref();
-const tempID = ref();
+const pattern = ref();
+
+const message = useMessage();
+const config = useRuntimeConfig();
+const renderSwitcherIcon = () => h(NIcon, null, { default: () => h(ChevronForward) });
+const { data: Collection } = await useFetch(
+  `${config.public.baseUrl}/v1/collection.json`
+);
+async function hanleOptionSelected(key) {
+  if (key.key === "add request" && key.id) {
+    const { data: request } = await useFetch(`${config.public.baseUrl}/v1/request.json`, {
+      method: "POST",
+      body: {
+        id: key.id,
+      },
+    });
+    let format = FomatData(request.value);
+    // console.log(
+    //   "🚀 ~ file: Default.vue:89 ~ hanleOptionSelected ~ request:",
+    //   request.value
+    // );
+    const isAppended = appendDataToElementWithId(Item.value, key.id, format);
+
+    if (isAppended) {
+      console.log("Dữ liệu đã được append vào phần tử có id tương ứng.");
+    } else {
+      console.log("Không tìm thấy phần tử có id tương ứng.");
+    }
+  }
+  console.log("🚀 ~ file: test.vue:32 ~ key ~ key:", key);
+}
+
+function FomatData(data) {
+  let dataFormated = {
+    key: data.id,
+    label: data.name,
+    suffix: () =>
+      h(SidebarOptions, {
+        onSelectedOption: hanleOptionSelected,
+        Options: optionsForFolder,
+        Target: data.id,
+      }),
+    prefix: () =>
+      h(
+        NIcon,
+        { size: 22 },
+        {
+          default: () => h(Json),
+        }
+      ),
+  };
+  if (data?.type) {
+    dataFormated.type = data.type;
+  }
+  // if (obj?.item) {
+  //   formattedObj.children = [];
+  //   formattedObj.prefix = null;
+  // }
+  if (data?.type == "folder") {
+    dataFormated.children = [];
+    dataFormated.prefix = () =>
+      h(
+        NIcon,
+        { size: 18 },
+        {
+          default: () => h(FolderOpenOutline),
+        }
+      );
+  }
+
+  if (data?.type == "request") {
+    dataFormated.prefix = () =>
+      h(
+        NButton,
+        { text: true, type: buttonType(data?.request?.method) },
+        { default: () => data?.request?.method || "GET" }
+      );
+  }
+  return dataFormated;
+}
+const optionsForFolder = [
+  {
+    label: "Add Request",
+    key: "add request",
+  },
+  {
+    label: "Rename",
+    key: "Rename",
+  },
+  {
+    label: "Delete",
+    key: "DeleteFd",
+  },
+];
+const Item = ref([]);
+
+function buttonType(method) {
+  switch (method) {
+    case "GET":
+      return "primary";
+    case "POST":
+      return "warning";
+    case "DELETE":
+      return "error";
+    case "PATCH":
+    case "PUT":
+      return "info";
+    default:
+      return "primary";
+  }
+}
+
+const nodeProps = ({ option }) => {
+  return {
+    async onClick() {
+      if (option.type == "request") {
+        await navigateTo(`/request/${option.key}`);
+      }
+      console.log("🚀 ~ file: Default.vue:196 ~ onClick ~ key:", option.key);
+
+      if (!option.children && !option.disabled && option.type == undefined) {
+        await navigateTo(`/response/${option.key}`);
+      }
+    },
+  };
+};
+
+const updatePrefixWithExpaned = (_keys, _option, meta) => {
+  console.log("🚀 ~ file: test.vue:83 ~ updatePrefixWithExpaned ~ _keys:", _keys);
+  console.log("🚀 ~ file: test.vue:83 ~ updatePrefixWithExpaned ~ _option:", _option);
+  if (!meta.node) return;
+  switch (meta.action) {
+    case "expand":
+      meta.node.prefix = () =>
+        h(NIcon, null, {
+          default: () => h(FolderOpenOutline),
+        });
+      break;
+    case "collapse":
+      meta.node.prefix = () =>
+        h(NIcon, null, {
+          default: () => h(Folder),
+        });
+      break;
+  }
+};
+
+function traverseAndFormat(obj) {
+  if (!obj) {
+    return null;
+  }
+
+  const formattedObj = {
+    key: obj.id,
+    label: obj.name,
+    suffix: () =>
+      h(SidebarOptions, {
+        onSelectedOption: hanleOptionSelected,
+        Options: optionsForFolder,
+        Target: obj.id,
+      }),
+    prefix: () =>
+      h(
+        NIcon,
+        { size: 22 },
+        {
+          default: () => h(Json),
+        }
+      ),
+  };
+  if (obj?.item) {
+    formattedObj.children = [];
+    formattedObj.prefix = null;
+  }
+  if (obj.type == "folder") {
+    formattedObj.children = [];
+    formattedObj.prefix = () =>
+      h(
+        NIcon,
+        { size: 18 },
+        {
+          default: () => h(FolderOpenOutline),
+        }
+      );
+  }
+
+  if (obj?.type == "request") {
+    formattedObj.type = obj.type;
+    formattedObj.prefix = () =>
+      h(
+        NButton,
+        { text: true, type: buttonType(obj?.request?.method) },
+        { default: () => obj?.request?.method || "GET" }
+      );
+  }
+
+  if (obj.item && obj.item.length > 0) {
+    obj.item?.forEach((item) => {
+      const child = traverseAndFormat(item);
+      formattedObj.children.push(child);
+    });
+  }
+
+  if (obj.response && obj.response.length > 0) {
+    formattedObj.children = [];
+    obj.response?.forEach((item) => {
+      const child = traverseAndFormat(item);
+      formattedObj.children.push(child);
+    });
+  }
+
+  if (obj?.item || obj.type == "folder") {
+    if (formattedObj.children && formattedObj.children.length == 0) {
+      const nullObj = {
+        key: obj.id + "1",
+        label:
+          "This " +
+          (obj.type === "folder" ? obj.type : "collection") +
+          " is empty add request to start working.",
+        disabled: true,
+      };
+      formattedObj.children.push(nullObj);
+    }
+  }
+
+  return formattedObj;
+}
+
+Collection.value.forEach((collection) => {
+  const processedCollection = traverseAndFormat(collection);
+  Item.value.push(processedCollection);
+});
+// console.log("🚀 ~ file: Default.vue:247 ~ Collection.value.forEach ~ Item:", Item.value);
+
+function appendDataToElementWithId(arr, id, newData) {
+  for (const item of arr) {
+    if (item.key === id) {
+      if (!item.children) {
+        item.children = [];
+      }
+      item.children.push(newData);
+      return true; // Đã tìm thấy và append dữ liệu
+    }
+    if (item.children && appendDataToElementWithId(item.children, id, newData)) {
+      return true; // Đã tìm thấy và append dữ liệu
+    }
+  }
+  return false; // Không tìm thấy phần tử có id tương ứng
+}
+
+const newData = {
+  key: "new-key",
+  label: "New Data",
+};
+
+// Id của phần tử mà bạn muốn append dữ liệu
+const targetId = "af3103f5-e75f-41c1-b416-7a3f86a52692"; // Ví dụ id này
+
+// Gọi hàm đệ quy để append dữ liệu vào phần tử có id tương ứng
+function AppendItem() {
+  const isAppended = appendDataToElementWithId(Item.value, targetId, newData);
+
+  if (isAppended) {
+    console.log("Dữ liệu đã được append vào phần tử có id tương ứng.");
+  } else {
+    console.log("Không tìm thấy phần tử có id tương ứng.");
+  }
+}
 
 const options = ref([
   {
@@ -42,20 +367,20 @@ const options = ref([
   },
 ]);
 
-const optionsForFolder = ref([
-  {
-    label: "Add Request",
-    key: "Add Request",
-  },
-  {
-    label: "Rename",
-    key: "Rename",
-  },
-  {
-    label: "Delete",
-    key: "DeleteFd",
-  },
-]);
+// const optionsForFolder = ref([
+//   {
+//     label: "Add Request",
+//     key: "Add Request",
+//   },
+//   {
+//     label: "Rename",
+//     key: "Rename",
+//   },
+//   {
+//     label: "Delete",
+//     key: "DeleteFd",
+//   },
+// ]);
 
 const optionsForRequest = ref([
   {
@@ -82,36 +407,20 @@ const optionsForExample = ref([
     key: "DeleteEx",
   },
 ]);
-const { data: object1 } = await useFetch(`http://127.0.0.1:8000/collection/list.json`);
 
-getCol.value = object1.value;
-if (getCol.value) {
-  for (let i = 0; i < object1.value.length; i++) {
-    const currentID = object1.value[i].ID;
-    console.log(currentID);
-    const { data: CltDetail } = await useFetch(
-      `http://127.0.0.1:8000/collection/detailcollection.json/${currentID}`
-    );
-    const obj2 = CltDetail.value;
-    console.log(CltDetail);
-    console.log(obj2);
-    for (let j = 0; j < getCol.value.length; j++) {
-      if (getCol.value[j].ID === obj2.InfoID) {
-        getCol.value[j].item = obj2.item;
-        break; // Không cần duyệt tiếp nữa nếu tìm thấy trùng khớp
-      }
-    }
-    console.log(currentID);
-  }
-}
+// const { data: Collection } = await useFetch(
+//   `${config.public.baseUrl}/v1/collection.json`
+// );
+
+getCol.value = Collection.value;
 Collection.value = getCol.value;
-console.log(Collection.value);
+// console.log(Collection.value);
 
 const addItem = async () => {
   const { data: NewClt } = await useFetch(`http://127.0.0.1:8000/collection/new.json`, {
     method: "POST",
   });
-  console.log(NewClt);
+  // console.log(NewClt);
   if (NewClt.value.ID !== undefined && NewClt.value.ID !== "") {
     const newItem = {
       ID: NewClt.value.ID,
@@ -213,7 +522,7 @@ const handleSelect = async (itemID, key, option, ...index) => {
       method: "DELETE",
       body: { id: itemID },
     });
-    console.log(data);
+    // console.log(data);
     if (data.value.ID == itemID) {
       deleteItem(itemID);
     } else {
@@ -228,7 +537,7 @@ const handleSelect = async (itemID, key, option, ...index) => {
       method: "DELETE",
       body: { id: itemID },
     });
-    console.log(data);
+    // console.log(data);
     if (data.value.ID == itemID) {
       deleteItem(itemID);
     } else {
@@ -338,7 +647,7 @@ const handleSelect = async (itemID, key, option, ...index) => {
   console.log(`Selected label: ${option.label}`);
   console.log(`Selected option object:`, option);
   console.log(`Selected option object:`, itemID);
-  tempID.value = itemID;
+  pattern.value = itemID;
 };
 const active = ref();
 const fileContent = ref("");
@@ -670,447 +979,10 @@ const ImportCollection = async () => {
   //   CltDetail.value.forEach(item => {
   //   impInfo.value.items.push(item); // thêm từng phần tử của CltDetail.value vào mảng items trong impInfo
   // });
-  console.log(impInfo.value);
+  // console.log(impInfo.value);
   Collection.value.push(impInfo.value);
 };
 // const SelectID = useState("CurrentID");
 // const updateExample = useState("newExamp");
-console.log(Collection.value);
+// console.log(Collection.value);
 </script>
-
-<template>
-  <NMessageProvider>
-    <div class="flex flex-row m0">
-      <div id="sidebar" class="bg-gray-50 flex flex-col w-80 h-screen items-center">
-        <!-- Add collection, search bar -->
-        <div class="p2 z-20 flex flex-row mt-2">
-          <button
-            @click="addItem"
-            class="p0 h-7 bg-slate-50 border-none hover:bg-gray-100 active:bg-gray-200 rounded items-center"
-          >
-            <NIcon size="28">
-              <Add />
-            </NIcon>
-          </button>
-          <div class="relative pl-1">
-            <div
-              class="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none"
-            >
-              <NIcon size="18" class="w-5 h-5 text-gray-400">
-                <Filter />
-              </NIcon>
-            </div>
-            <input
-              v-model="tempID"
-              type="text"
-              placeholder="Filter"
-              class="h-6 border-1 border-slate-200 bg-slate-50 pl-9 p-0.5 text-gray-900 hover:bg-gray-100 hover:focus:bg-white focus:bg-white focus:outline-none"
-            />
-          </div>
-          <NUpload :show-file-list="false" accept=".json" @change="handleFileChange">
-            <button
-              class="ml-2 px-1 h-7 bg-slate-50 border-none hover:bg-gray-100 active:bg-gray-200 rounded items-center"
-            >
-              <NIcon size="20"> <DocumentImport /> </NIcon>
-            </button>
-          </NUpload>
-        </div>
-
-        <!-- Collection sidebar list -->
-        <div class="mt-5 w-4/5 p2 overflow-y-auto">
-          <!-- <p>{{ updateExample }}</p>
-          <p>{{ SelectID }}</p> -->
-          <NCollapse>
-            <div v-if="Collection">
-              <div v-for="(item, itemIndex) in Collection">
-                <NCollapseItem>
-                  <template #header>
-                    <div v-if="active != item.ID">{{ item.Name }}</div>
-                    <div v-else>
-                      <n-input
-                        type="text"
-                        size="small"
-                        v-model:value="item.Name"
-                        autofocus
-                        @change="(v) => ChangeCollectionName(v, item.ID)"
-                        @blur="
-                          () => {
-                            active = '';
-                          }
-                        "
-                      />
-                    </div>
-                  </template>
-                  <template #header-extra>
-                    <n-dropdown
-                      trigger="hover"
-                      placement="bottom-end"
-                      :options="options"
-                      @select="
-                        (key, option) => handleSelect(item.ID, key, option, itemIndex)
-                      "
-                    >
-                      <NIcon size="18" class="w-5 h-5 text-gray-400">
-                        <EllipsisHorizontalOutline />
-                      </NIcon>
-                    </n-dropdown>
-                  </template>
-                  <div v-if="item.item && item.item.length">
-                    <div v-for="(folder, folderIndex) in item.item">
-                      <div v-if="folder.IsFolder">
-                        <NCollapseItem>
-                          <template #header-extra>
-                            <n-dropdown
-                              trigger="hover"
-                              placement="bottom-end"
-                              :options="optionsForFolder"
-                              @select="
-                                (key, option) =>
-                                  handleSelect(
-                                    folder.ID,
-                                    key,
-                                    option,
-                                    itemIndex,
-                                    folderIndex
-                                  )
-                              "
-                            >
-                              <NIcon size="18" class="w-5 h-5 text-gray-400">
-                                <EllipsisHorizontalOutline />
-                              </NIcon>
-                            </n-dropdown>
-                          </template>
-                          <template #header>
-                            <div v-if="active != folder.ID">
-                              <NIcon size="15" class="pr-1">
-                                <Folder />
-                              </NIcon>
-                              {{ folder.Name }}
-                            </div>
-                            <div v-else>
-                              <NIcon size="15" class="pr-1">
-                                <Folder />
-                              </NIcon>
-                              <n-input
-                                type="text"
-                                size="small"
-                                v-model:value="folder.Name"
-                                autofocus
-                                @change="(v) => ChangeFolderName(v, folder.ID)"
-                                @blur="
-                                  () => {
-                                    active = '';
-                                  }
-                                "
-                              />
-                            </div>
-                          </template>
-                          <div v-if="folder.item?.length > 0">
-                            <div v-for="(request, requestIndex) in folder.item">
-                              <div v-if="request.response?.length > 0">
-                                <NCollapseItem>
-                                  <template #header-extra>
-                                    <n-dropdown
-                                      trigger="hover"
-                                      placement="bottom-end"
-                                      :options="optionsForRequest"
-                                      @select="
-                                        (key, option) =>
-                                          handleSelect(
-                                            request.ID,
-                                            key,
-                                            option,
-                                            itemIndex,
-                                            folderIndex,
-                                            requestIndex
-                                          )
-                                      "
-                                    >
-                                      <NIcon size="18" class="w-5 h-5 text-gray-400">
-                                        <EllipsisHorizontalOutline />
-                                      </NIcon>
-                                    </n-dropdown>
-                                  </template>
-                                  <template #header>
-                                    <div v-if="active != request.ID">
-                                      <NuxtLink :to="{ path: '/request/' + request.ID }">
-                                        {{ request.Name }}
-                                      </NuxtLink>
-                                    </div>
-                                    <div v-else>
-                                      <n-input
-                                        type="text"
-                                        size="small"
-                                        v-model:value="request.Name"
-                                        autofocus
-                                        @change="(v) => ChangeRequestName(v, request.ID)"
-                                        @blur="
-                                          () => {
-                                            active = '';
-                                          }
-                                        "
-                                      />
-                                    </div>
-                                  </template>
-                                  <div
-                                    v-for="(response, responseIndex) in request.response"
-                                    class="flex"
-                                  >
-                                    <div v-if="active != response.ID">
-                                      <NuxtLink
-                                        :to="{ path: '/response/' + response.ID }"
-                                      >
-                                        {{ response.Name }}
-                                      </NuxtLink>
-                                    </div>
-                                    <div v-else>
-                                      <n-input
-                                        type="text"
-                                        size="small"
-                                        v-model:value="response.Name"
-                                        autofocus
-                                        @change="(v) => ChangeExampleName(v, response.ID)"
-                                        @blur="
-                                          () => {
-                                            active = '';
-                                          }
-                                        "
-                                      />
-                                    </div>
-
-                                    <div class="grow flex justify-end">
-                                      <n-dropdown
-                                        trigger="hover"
-                                        placement="bottom-end"
-                                        :options="optionsForExample"
-                                        @select="
-                                          (key, option) =>
-                                            handleSelect(
-                                              response.ID,
-                                              key,
-                                              option,
-                                              itemIndex,
-                                              folderIndex,
-                                              requestIndex,
-                                              responseIndex
-                                            )
-                                        "
-                                      >
-                                        <NIcon size="18" class="w-5 h-5 text-gray-400">
-                                          <EllipsisHorizontalOutline />
-                                        </NIcon>
-                                      </n-dropdown>
-                                    </div>
-                                  </div>
-                                </NCollapseItem>
-                              </div>
-                              <div v-else class="pb-3 flex">
-                                <div v-if="active != request.ID">
-                                  <NuxtLink :to="{ path: '/request/' + request.ID }">
-                                    {{ request.Name }}
-                                  </NuxtLink>
-                                </div>
-                                <div v-else>
-                                  <n-input
-                                    type="text"
-                                    size="small"
-                                    v-model:value="request.Name"
-                                    autofocus
-                                    @change="(v) => ChangeRequestName(v, request.ID)"
-                                    @blur="
-                                      () => {
-                                        active = '';
-                                      }
-                                    "
-                                  />
-                                </div>
-
-                                <div class="grow flex justify-end">
-                                  <n-dropdown
-                                    trigger="hover"
-                                    placement="bottom-end"
-                                    :options="optionsForRequest"
-                                    @select="
-                                      (key, option) =>
-                                        handleSelect(
-                                          request.ID,
-                                          key,
-                                          option,
-                                          itemIndex,
-                                          folderIndex,
-                                          requestIndex
-                                        )
-                                    "
-                                  >
-                                    <NIcon size="18" class="w-5 h-5 text-gray-400">
-                                      <EllipsisHorizontalOutline />
-                                    </NIcon>
-                                  </n-dropdown>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div v-else>Folder empty</div>
-                        </NCollapseItem>
-                        <NDivider style="margin-top: 10px; margin-bottom: 10px" />
-                      </div>
-                      <div v-else>
-                        <div v-if="folder.response?.length > 0">
-                          <NCollapseItem>
-                            <template #header-extra>
-                              <n-dropdown
-                                trigger="hover"
-                                placement="bottom-end"
-                                :options="optionsForRequest"
-                                @select="
-                                  (key, option) =>
-                                    handleSelect(
-                                      folder.ID,
-                                      key,
-                                      option,
-                                      itemIndex,
-                                      folderIndex
-                                    )
-                                "
-                              >
-                                <NIcon size="18" class="w-5 h-5 text-gray-400">
-                                  <EllipsisHorizontalOutline />
-                                </NIcon>
-                              </n-dropdown>
-                            </template>
-                            <template #header>
-                              <div v-if="active != folder.ID">
-                                <NuxtLink :to="{ path: '/request/' + folder.ID }">
-                                  {{ folder.Name }}
-                                </NuxtLink>
-                              </div>
-                              <div v-else>
-                                <n-input
-                                  type="text"
-                                  size="small"
-                                  v-model:value="folder.Name"
-                                  autofocus
-                                  @change="(v) => ChangeRequestName(v, folder.ID)"
-                                  @blur="
-                                    () => {
-                                      active = '';
-                                    }
-                                  "
-                                />
-                              </div>
-                            </template>
-                            <div
-                              v-for="(response, responseIndex) in folder.response"
-                              class="flex"
-                            >
-                              <div v-if="active != response.ID">
-                                <NuxtLink :to="{ path: '/response/' + response.ID }">
-                                  {{ response.Name }}
-                                </NuxtLink>
-                              </div>
-                              <div v-else>
-                                <n-input
-                                  type="text"
-                                  size="small"
-                                  v-model:value="response.Name"
-                                  autofocus
-                                  @change="(v) => ChangeExampleName(v, response.ID)"
-                                  @blur="
-                                    () => {
-                                      active = '';
-                                    }
-                                  "
-                                />
-                              </div>
-
-                              <div class="grow flex justify-end">
-                                <n-dropdown
-                                  trigger="hover"
-                                  placement="bottom-end"
-                                  :options="optionsForExample"
-                                  @select="
-                                    (key, option) =>
-                                      handleSelect(
-                                        response.ID,
-                                        key,
-                                        option,
-                                        itemIndex,
-                                        folderIndex,
-                                        responseIndex
-                                      )
-                                  "
-                                >
-                                  <NIcon size="18" class="w-5 h-5 text-gray-400">
-                                    <EllipsisHorizontalOutline />
-                                  </NIcon>
-                                </n-dropdown>
-                              </div>
-                            </div>
-                          </NCollapseItem>
-                        </div>
-
-                        <div v-else class="flex">
-                          <div v-if="active != folder.ID">
-                            <NuxtLink :to="{ path: '/request/' + folder.ID }">
-                              {{ folder.Name }}
-                            </NuxtLink>
-                          </div>
-                          <div v-else>
-                            <n-input
-                              type="text"
-                              size="small"
-                              v-model:value="folder.Name"
-                              autofocus
-                              @change="(v) => ChangeRequestName(v, folder.ID)"
-                              @blur="
-                                () => {
-                                  active = '';
-                                }
-                              "
-                            />
-                          </div>
-
-                          <div class="grow flex justify-end">
-                            <n-dropdown
-                              trigger="hover"
-                              placement="bottom-end"
-                              :options="optionsForRequest"
-                              @select="
-                                (key, option) =>
-                                  handleSelect(
-                                    folder.ID,
-                                    key,
-                                    option,
-                                    itemIndex,
-                                    folderIndex
-                                  )
-                              "
-                            >
-                              <NIcon size="18" class="w-5 h-5 text-gray-400">
-                                <EllipsisHorizontalOutline />
-                              </NIcon>
-                            </n-dropdown>
-                          </div>
-                        </div>
-                        <!-- <button @click="handleRqClick(folder.ID)">{{ folder.Name }}</button> -->
-                      </div>
-                    </div>
-                  </div>
-                  <div v-else>Collection empty</div>
-                </NCollapseItem>
-                <NDivider style="margin-top: 10px; margin-bottom: 10px" />
-              </div>
-            </div>
-            <div v-else>
-              <div>Workspace empty</div>
-            </div>
-          </NCollapse>
-          <!-- <pre>{{ JSON.stringify(Collection, null, 2) }}</pre> -->
-        </div>
-      </div>
-      <div id="main" class="flex flex-col grow px-2 max-h-screen">
-        <slot />
-      </div>
-    </div>
-  </NMessageProvider>
-</template>

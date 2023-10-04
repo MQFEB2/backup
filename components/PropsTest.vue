@@ -1,5 +1,5 @@
 <template>
-  <NCard class="h-4/5">
+  <NCard class="h-4/5 overflow-auto">
     <n-config-provider :hljs="hljs">
       <NCode
         v-if="propsDatass"

@@ -3,38 +3,27 @@
     <n-message-provider>
       <n-notification-provider>
         <n-loading-bar-provider>
-          <Default />
+          <NuxtLayout>
+            <NuxtPage />
+          </NuxtLayout>
         </n-loading-bar-provider>
       </n-notification-provider>
     </n-message-provider>
   </n-dialog-provider>
 </template>
 
-<script lang="ts">
+<script>
 import { defineComponent } from "vue";
 import {
-  NConfigProvider,
   NMessageProvider,
   NDialogProvider,
   NNotificationProvider,
   NLoadingBarProvider,
-  GlobalThemeOverrides,
 } from "naive-ui";
 
-const themeOverrides: GlobalThemeOverrides = {
-  common: {
-    primaryColor: "#4fb233",
-    primaryColorHover: "#4fb233",
-    fontSize: "16px",
-    borderRadius: "16px",
-  },
-};
-
 export default defineComponent({
-  name: "Provider",
+  name: "App",
   components: {
-    App,
-    NConfigProvider,
     NMessageProvider,
     NDialogProvider,
     NNotificationProvider,
